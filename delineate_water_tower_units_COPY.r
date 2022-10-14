@@ -17,7 +17,7 @@ library(tidyverse)
 library(lwgeom)
 library(terra)
 library(tidyr)
-library(rgdal)
+
 
 ##SETTINGS
 base = "F:\\impact_index\\water_towers\\data\\"
@@ -27,51 +27,64 @@ continents <- c("europe","austpacific","centralam","neareast","northam","asia","
 resolution <- 0.05
 ##SETTINGS END
 
-# Read the GMBA shapefile
-gmbafn = paste(base,"Delineation/GMBA_MountainRanges/GMBA Mountain Inventory_v1.2-World.shp",sep="") 
-gmba_ori <- read_sf(gmbafn)
+# # Read the GMBA shapefile
+# gmbafn = paste(base,"Delineation/GMBA_MountainRanges/GMBA Mountain Inventory_v1.2-World.shp",sep="") 
+# gmba_ori <- read_sf(gmbafn)
+# 
+# # Filenames glacier ice volume and area and snow persistence rasters
+# glacvfn = paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_volume_km3.tif",sep="")
+# glacafn = paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_area_km2.tif",sep="")
+# snowfn =  paste(base,"snow/processed/Snow_persistence_avg_annual.tif",sep="")
+# 
+# # Read in the tiff files
+# glacvtif = rast(paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_volume_km3.tif",sep=""))
+# glacatif = rast(paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_area_km2.tif",sep=""))
+# snowtif =  rast(paste(base,"snow/processed/Snow_persistence_avg_annual.tif",sep=""))
+# 
+# # Summarize zones for glacier volume, glacier area and snow persistence
+# # Create a subset based on thresholds and save as new polygon
+# gmbafn2 = paste(base,"index/units/gmba_all.shp",sep="") #read_sf(paste(base,"index/units/gmba_all.shp",sep="")) 
+# #gmba <- ZonalPipe(gmbafn, glacvfn, stat="sum") ## no longer supported https://github.com/chrisvwn/Rnightlights
+# gmba <- extract(gmba_ori, glacvtif, sum, bind=TRUE) #alternative to ZonalPipe?
+# names(gmba)[3]<-"vol_km3"
+# #----------------------------------------------------------------------------------------------------
+# # 10/13/22 STOPPING POINT. Error in writeOGR(gmba, gmbafn2, "gmba_all", driver = "ESRI Shapefile", : is.character(dsn) is not TRUE
+# writeOGR(gmba,gmbafn2,"gmba_new",driver="ESRI Shapefile",overwrite_layer=TRUE) 
+# 
+# # Glacier area
+# gmba <- ZonalPipe(gmbafn2, glacafn, stat="sum")
+# names(gmba)[5]<-"area_km2"
+# writeOGR(gmba, gmbafn2,"gmba_all",driver= "ESRI Shapefile",overwrite_layer=TRUE)
+# 
+# # Snow persistence
+# gmba <- ZonalPipe(gmbafn2, snowfn, stat="mean")
+# names(gmba)[6]<-"snow_p"
+# writeOGR(gmba, gmbafn2,"gmba_all","ESRI Shapefile",overwrite_layer=TRUE)
+# 
+# # Thesholds for ice volume, glacier area and snow persistence
+# gv = 0.1
+# ga = 0.1
+# sp = 0.1
+# 
+# gmba2 <- subset(gmba,((vol_km3 > gv)|(snow_p > sp))&(area_km2 > ga))
+# gmba2
+# gmbafn3 = paste(base,"index/units/gmba_ss.shp",sep="") 
+# writeOGR(gmba2, gmbafn3,"gmba_ss","ESRI Shapefile",overwrite_layer=TRUE)
 
-# Filenames glacier ice volume and area and snow persistence rasters
-glacvfn = paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_volume_km3.tif",sep="")
-glacafn = paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_area_km2.tif",sep="")
-snowfn =  paste(base,"snow/processed/Snow_persistence_avg_annual.tif",sep="")
-
-# Read in the tiff files
-glacvfn = rast(paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_volume_km3.tif",sep=""))
-glacafn = rast(paste(base,"Glaciers/Farinotti_NGEO_2019/p05_degree_glacier_area_km2.tif",sep=""))
-snowfn =  rast(paste(base,"snow/processed/Snow_persistence_avg_annual.tif",sep=""))
-
-# Summarize zones for glacier volume, glacier area and snow persistence
-# Create a subset based on thresholds and save as new polygon
-gmbafn2 = read_sf(paste(base,"index/units/gmba_all.shp",sep=""))
-#gmba <- ZonalPipe(gmbafn, glacvfn, stat="sum") ## no longer supported https://github.com/chrisvwn/Rnightlights
-gmba <- extract(glacvfn, gmba_ori, sum) #alternative to ZonalPipe?
-names(gmba)[2]<-"vol_km3"
-#----------------------------------------------------------------------------------------------------
-# 10/13/22 STOPPING POINT. Error in writeOGR(gmba, gmbafn2, "gmba_all", driver = "ESRI Shapefile", : is.character(dsn) is not TRUE
-writeOGR(gmba, gmbafn2,"gmba_new","ESRI Shapefile",overwrite_layer=TRUE)
-
-# Glacier area
-gmba <- ZonalPipe(gmbafn2, glacafn, stat="sum")
-names(gmba)[5]<-"area_km2"
-writeOGR(gmba, gmbafn2,"gmba_all",driver= "ESRI Shapefile",overwrite_layer=TRUE)
-
-# Snow persistence
-gmba <- ZonalPipe(gmbafn2, snowfn, stat="mean")
-names(gmba)[6]<-"snow_p"
-writeOGR(gmba, gmbafn2,"gmba_all","ESRI Shapefile",overwrite_layer=TRUE)
-
-# Thesholds for ice volume, glacier area and snow persistence
-gv = 0.1
-ga = 0.1
-sp = 0.1
-
-gmba2 <- subset(gmba,((vol_km3 > gv)|(snow_p > sp))&(area_km2 > ga))
-gmba2
-gmbafn3 = paste(base,"index/units/gmba_ss.shp",sep="") 
-writeOGR(gmba2, gmbafn3,"gmba_ss","ESRI Shapefile",overwrite_layer=TRUE)
+#---------------------------------------------------------------------------------------------------------------
+# DID ALL OF THE ABOVE IN QGIS
+#   GMBA Mountain inventory_v1.2-World.shp was fixed using the "Fix geometries" tool.
+#   p05_degree_glacier_volume_km3 and p05_degree_glacier_area_km2 rasters from Farinotti 
+#   and the Snow_persistence_avg_annual raster from MODIS were loaded. 
+#   The zonal statistics of each GMBA zone were calculated, using the sum for the volume and area and then
+#   the mean of the snow using Zonal Statistics tool. The GMBA, glacier volume
+#   glacier area, and snow persistence stats were combined into one shapefile
+#   using the "select by function" tool, with function "(vol_km3 > 0.1 OR snow_p >0.1) AND area_km2 >0.1"
+#   as done above. The new shapefile has an attribute table with "Name", "Country", 
+#   "vol_km3", "Area_km2", and "snow_p" as table column names.
 
 # intersect hydrobasins and filtered GMBA mountain ranges, then dissolve boundaries to get WTUs
+gmbafn3 = "F:\\impact_index\\Q_file\\gmba_ss.shp"
 mntns <- read_sf(gmbafn3)
 WTU1 <- st_intersection(hydrobasins,mntns)
 WTU2 <- st_make_valid(WTU1)
