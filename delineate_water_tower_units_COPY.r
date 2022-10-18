@@ -22,7 +22,7 @@ library(tidyr)
 ##SETTINGS
 base = "F:\\impact_index\\water_towers\\data\\"
 outdir <- "F:\\impact_index\\water_towers\\data\\index\\units\\"
-hydrobasins <- st_make_valid(read_sf(paste(base,"Basins\\FAO\\major_hydrobasins.shp",sep="")))
+hydrobasins = read_sf("F:\\impact_index\\Q_file\\major_hydrobasins.shp")
 continents <- c("europe","austpacific","centralam","neareast","northam","asia","southam")
 resolution <- 0.05
 ##SETTINGS END
