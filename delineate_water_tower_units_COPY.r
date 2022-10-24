@@ -84,16 +84,16 @@ resolution <- 0.05
 #   "vol_km3", "Area_km2", and "snow_p" as table column names.
 
 # intersect hydrobasins and filtered GMBA mountain ranges, then dissolve boundaries to get WTUs
-gmbafn3 = "F:\\impact_index\\Q_file\\gmba_ss.shp"
+gmbafn3 = "F:\\impact_index\\Q_file\\gmba_ss.shp" #"F:\\impact_index\\WTU_units\\gmba_ss.shp" #
 mntns <- read_sf(gmbafn3)
-WTU1 <- st_intersection(hydrobasins,mntns)
-WTU2 <- st_make_valid(WTU1)
-WTU3 <- WTU2 %>% group_by(WTU2$MAJ_BAS) %>% summarize_all(mean)
+WTU1 <- st_intersection(hydrobasins,mntns) #find the intersection btwn the hydro basins and mountain basins
+WTU2 <- st_make_valid(WTU1) # fix the geometry
+WTU3 <- WTU2 %>% group_by(WTU2$MAJ_BAS) %>% summarize_all(mean) # dissolve the mntn basin boundaries, keeping the hydro basin boundaries
 
-write_sf(WTU3,paste(outdir,"wtu_temp.shp",sep=""))
+write_sf(WTU3,paste(outdir,"wtu_temp.shp",sep="")) # make this a shapefile and save to the out directory
 
 #read WTU shp
-WTU <- st_make_valid(read_sf(paste(outdir,"wtu_temp.shp",sep="")))
+WTU <- st_make_valid(read_sf(paste(outdir,"wtu_temp.shp",sep=""))) # read in the newly created shapefile and fix the geometry
 
 #extract downstream areas of WTUs
 #loop over continents using continent-based FAO hydrobasins shapefiles with subbasins
@@ -254,7 +254,8 @@ write.csv(df,paste(outdir,"WTU_specs.csv",sep=""))
 WTU_vector <- rasterToPolygons(WTU_reclass,na.rm=T,dissolve=T)
 WTU_names2 <- WTU_names[,2:3]
 colnames(WTU_names2)<-c("WTU_ID","WTU_NAME")
-WTU_vector2 <- append_data(WTU_vector, WTU_names2, key.shp = "WTU_ID", key.data = "WTU_ID")
+# WTU_vector2 <- append_data(WTU_vector, WTU_names2, key.shp = "WTU_ID", key.data = "WTU_ID") ## append_data is no longer supported
+WTU_vector2 <- merge(WTU_vector, WTU_names2, by = "WTU_ID")  ## Merge is used instead of append_data
 rgdal::writeOGR(WTU_vector2,dsn=paste(outdir,"WTU_vector.shp",sep=""),layer="WTU_vector", driver="ESRI Shapefile", overwrite_layer=T)
 
 ##create vector version of basins grid and write as shapefile with WTU_ID and WTU_NAME attributes
