@@ -78,10 +78,11 @@ resolution <- 0.05
 #   and the Snow_persistence_avg_annual raster from MODIS were loaded. 
 #   The zonal statistics of each GMBA zone were calculated, using the sum for the volume and area and then
 #   the mean of the snow using Zonal Statistics tool. The GMBA, glacier volume
-#   glacier area, and snow persistence stats were combined into one shapefile
+#   glacier area, and snow persistence stats were combined into one shapefile (named: gmba_all). A subset of the data is selected 
 #   using the "select by function" tool, with function "(vol_km3 > 0.1 OR snow_p >0.1) AND area_km2 >0.1"
-#   as done above. The new shapefile has an attribute table with "Name", "Country", 
-#   "vol_km3", "Area_km2", and "snow_p" as table column names.
+#   as done above (named: gmba_ss). The new shapefile has an attribute table with "Name", "Country", 
+#   "vol_km3", "Area_km2", and "snow_p" as table column names. Any names that differ can be changed using
+#   the vector table toolbox > rename field
 
 # intersect hydrobasins and filtered GMBA mountain ranges, then dissolve boundaries to get WTUs
 gmbafn3 = "F:\\impact_index\\Q_file\\gmba_ss.shp" #"F:\\impact_index\\WTU_units\\gmba_ss.shp" #
